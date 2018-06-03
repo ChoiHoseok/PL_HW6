@@ -1,7 +1,6 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <stdio.h>
-void runKernel(int N, float *x, float *y, float *z) ;
 
 __global__
 void cudaMultVectorsKernel(int N, float *x, float *y, float *z)
