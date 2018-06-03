@@ -5,13 +5,13 @@
 #define THREADS_PER_BLOCK 512
 
 __global__ void stencil_1d(int *in, int *out) {
-	__shared__ int temp[BLOCK_SIZE + 2 * RADIUS];
+	__shared__ int temp[THREADS_PER_BLOCK + 2 * RADIUS];
 	int gindex = threadIdx.x + blockIdx.x * blockDim.x;
 	int lindex = threadIdx.x + RADIUS;
 	temp[lindex] = in[gindex];
 	if(threadIdx.x < RADIUS){
 		temp[lindex - RADIUS] = in[gindex - RADIUS];
-		temp[lindex + BLOCK_SIZE] = in[gindex + BLOCK_SIZE];
+		temp[lindex + THREADS_PER_BLOCK] = in[gindex + THREADS_PER_BLOCK];
 	}
 	__syncthreads();
 
