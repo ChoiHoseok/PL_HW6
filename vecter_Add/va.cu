@@ -3,8 +3,10 @@
 #define N (2048*2048)
 #define THREADS_PER_BLOCK 512
 
-__global__ void add(int *a, int *b, int *c) {
-	c[threadIdx.x] = a[threadIdx.x] + b[threadIdx.x];
+__global__ void add(int *a, int *b, int *c, int n) {
+	int index = threadIdx.x + blockIdx.x * blockDim.x;
+	if(index < n)
+		c[index] = a[index] + b[index];
 }
 
 void random_ints(int* a);
@@ -28,7 +30,7 @@ int main(void){
 	cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
 
-	add<<<N/THREADS_PER_BLOCK,THREADS_PER_BLOCK>>>(d_a, d_b, d_c);
+	add<<<N/THREADS_PER_BLOCK,THREADS_PER_BLOCK>>>(d_a, d_b, d_c, N);
 	cudaMemcpy(c, d_c, size, cudaMemcpyDeviceToHost);
 	for(i = 0; i < 512; i++){
 		printf("%d ",c[i]);
