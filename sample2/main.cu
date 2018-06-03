@@ -15,7 +15,7 @@ void cudaMultVectorsKernel(int N, float *x, float *y, float *z)
 // extern "C" is necessary because nvcc uses c++ compiler to compile cuda code
 // hence applies name mangling. Because we use gcc for linking, we should 
 // prevent name mangling.
-extern "C"
+//extern "C"
 void runKernel(int N, float *x, float *y, float *z) {
     cudaMultVectorsKernel<<<(N+511)/512, 512>>>(N, x, y, z);
 }
