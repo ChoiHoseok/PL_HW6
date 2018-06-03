@@ -1,7 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #define RADIUS 3
-
+#define N (2048*2048)
+#define THREADS_PER_BLOCK 512
 
 __global__ void stencil_1d(int *in, int *out) {
 	__shared__ int temp[BLOCK_SIZE + 2 * RADIUS];
@@ -19,7 +20,7 @@ __global__ void stencil_1d(int *in, int *out) {
 		result += temp[lindex + offset];
 	}
 
-	out[gindex] = result
+	out[gindex] = result;
 }
 
 void random_ints(int* a);
