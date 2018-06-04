@@ -33,13 +33,13 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
 
     for(i = 0; i < filter_size; i++){
         for(j = 0; j < filter_size; j++){
-            temp = input[col*filter_size + i][row*filter_size + j];
-            if(large < input[col*filter_size + i][row*filter_size + j]){
+            temp = input[input_size*col+filter_size*i+j];
+            if(large < temp){
                 large = temp; 
             }
         }
     }
-    output[col][row] = large;
+    output[filter_size*col+row] = large;
     // out of bound
 
     // CHANGE
