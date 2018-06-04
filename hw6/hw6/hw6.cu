@@ -28,18 +28,18 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
     int i,j;
-    int large = 0
+    int large = 0;
     int temp;
 
     for(i = 0; i < filter_size; i++){
         for(j = 0; j < filter_size; j++){
-            temp = input[col*filter_size + i][row*filter_size + j]
+            temp = input[col*filter_size + i][row*filter_size + j];
             if(large < input[col*filter_size + i][row*filter_size + j]){
                 large = temp; 
             }
         }
     }
-    output[col][row] = large
+    output[col][row] = large;
     // out of bound
 
     // CHANGE
