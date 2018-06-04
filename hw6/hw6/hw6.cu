@@ -191,12 +191,13 @@ int main(int argc, char **argv) {
     // allocate output buf in main memory
     float *gemm_output_buf = (float*) malloc (sizeof(float)*input_size*input_size);
     float *maxpool_output_buf = (float*) malloc (sizeof(float)*maxpool_output_size*maxpool_output_size);
-    /*
+    
     // copy results from device to host
-    cudaMemcpy(gemm_output_buf, gemm_output, sizeof(float)*input_size*input_size, cudaMemcpyDeviceToHost);
+    //cudaMemcpy(gemm_output_buf, gemm_output, sizeof(float)*input_size*input_size, cudaMemcpyDeviceToHost);
     cudaMemcpy(maxpool_output_buf, maxpool_output, sizeof(float)*maxpool_output_size*maxpool_output_size, cudaMemcpyDeviceToHost);
     
-    // prints the results
+    
+    /*// prints the results
     cout<<"\n========== GEMM OUTPUT ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
