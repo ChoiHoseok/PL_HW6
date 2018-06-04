@@ -128,6 +128,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
+    /*
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -145,6 +146,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<c[i]<<" ";
     }
+    */
     cout<<'\n';
        
     // set thread, block dimensions
