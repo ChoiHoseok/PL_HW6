@@ -39,7 +39,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
             }
         }
     }
-    output[filter_size*col+row] = large;
+    output[filter_size*col+row] = col;
     // out of bound
 
     // CHANGE
