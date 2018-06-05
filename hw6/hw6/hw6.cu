@@ -75,7 +75,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
         // You need to use __syncthreads() a few times
         // to synchronize the threads in a thread block.
-        s_a[ty][tx] = a[row*input_size+p*TILE_WIDTH];
+        s_a[ty][tx] = alpha*a[row*input_size+p*TILE_WIDTH];
         s_b[ty][tx] = b[p*input_size*TILE_WIDTH+col];
         __syncthreads();
         for(int i = 0; i < TILE_WIDTH;i++){
@@ -83,7 +83,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         }
         __syncthreads();
     }
-    output[row*input_size + col] = result + c[row*input_size + col];
+    output[row*input_size + col] = result + beta * c[row*input_size + col];
     // write out the result to output[row*input_size + col] 
     // CHANGE
 }
