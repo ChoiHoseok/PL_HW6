@@ -79,7 +79,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         s_b[ty][tx] = b[p*input_size*TILE_WIDTH+col];
         __syncthreads();
         for(int i = 0; i < TILE_WIDTH;i++){
-            result += s_a[ty][i]*s_b[i][tx];
+            result += (s_a[ty][i]*s_b[i][tx]);
         }
         __syncthreads();
     }
