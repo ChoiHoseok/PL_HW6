@@ -40,7 +40,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
         }
     }
     if(col < (input_size/filter_size) && row < (input_size/filter_size))
-        output[(input_size/filter_size*col)+row] = large;
+        output[((input_size/filter_size)*col)+row] = large;
     // out of bound
 
     // CHANGE
@@ -75,8 +75,15 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
         // You need to use __syncthreads() a few times
         // to synchronize the threads in a thread block.
+        s_a[ty][tx] = a[row*input_size+p*TILE_WIDTH];
+        s_b[ty][tx] = b[p*input_size*TILE_WIDTH+col];
+        __syncthreads();
+        for(int i = 0; i < TILE_WIDTH;i++){
+            result += s_a[ty][i]*s_b[i][tx];
+        }
+        __syncthreads();
     }
-
+    output[row*input_size + col] = result + c[row*input_size + col];
     // write out the result to output[row*input_size + col] 
     // CHANGE
 }
@@ -129,7 +136,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
-    /*
+    
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -147,7 +154,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<c[i]<<" ";
     }
-    */
+    
     cout<<'\n';
        
     // set thread, block dimensions
@@ -200,13 +207,13 @@ int main(int argc, char **argv) {
     cudaMemcpy(maxpool_output_buf, maxpool_output, sizeof(float)*maxpool_output_size*maxpool_output_size, cudaMemcpyDeviceToHost);
     
     
-    /*// prints the results
+    // prints the results
     cout<<"\n========== GEMM OUTPUT ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
         cout<<gemm_output_buf[i]<<" ";
     }
-    */
+    
     cout<<"\n========== MAXPOOL OUTPUT ==========\n";
     for (int i = 0; i < maxpool_output_size * maxpool_output_size; ++i) {
         if(i%maxpool_output_size==0) cout<<"\n";
