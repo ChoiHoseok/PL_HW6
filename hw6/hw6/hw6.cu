@@ -9,7 +9,7 @@
 #include<vector>
 #include<string>
 
-#define TILE_WIDTH 4   /* set TILE_WIDTH 16 for the evaluation! */
+#define TILE_WIDTH 2   /* set TILE_WIDTH 16 for the evaluation! */
 #define MAXPOOL_INPUT_FILENAME "input.txt"
 #define A_FILENAME "a.txt"
 #define B_FILENAME "b.txt"
@@ -81,10 +81,9 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         for(int i = 0; i < TILE_WIDTH;i++){
             result += (s_a[ty][i]*s_b[i][tx]);
         }
-        //result += s_a[ty][0] * s_b[0][tx];
         __syncthreads();
     }
-    output[row*input_size + col] = result;
+    output[row*input_size + col] = result + c[row*input_size + col];
     //output[row*input_size + col] = 1; 
     // write out the result to output[row*input_size + col] 
     // CHANGE
@@ -151,14 +150,14 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<b[i]<<" ";
     }
-    /*
+    
     cout<<"\nbeta : "<<beta<<'\n';
     cout<<"========== C ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
         cout<<c[i]<<" ";
     }
-    */
+    
     cout<<'\n';
        
     // set thread, block dimensions
