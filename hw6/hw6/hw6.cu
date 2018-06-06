@@ -108,8 +108,6 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     }
 
     output[row*input_size + col] = result + beta * c[row*input_size + col];
-    //output[row*input_size + col] = result;
-    //output[row*input_size + col] = 1; 
     // write out the result to output[row*input_size + col] 
     // CHANGE
 }
@@ -157,13 +155,13 @@ int main(int argc, char **argv) {
     
     // prints inputs for debugging.
     cout<<"filter size : "<<filter_size;
-    /*
+    
     cout<<"\n========== MAXPOOL_INPUT ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
-    */
+    
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -241,14 +239,14 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<gemm_output_buf[i]<<" ";
     }
-    /*
+    
     cout<<"\n========== MAXPOOL OUTPUT ==========\n";
     for (int i = 0; i < maxpool_output_size * maxpool_output_size; ++i) {
         if(i%maxpool_output_size==0) cout<<"\n";
         cout<<maxpool_output_buf[i]<<" ";
     }
     cout<<'\n';
-    */
+    
     cudaFree(dev_mem_a);
     cudaFree(dev_mem_b);
     cudaFree(dev_mem_c);
