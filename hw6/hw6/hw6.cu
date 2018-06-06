@@ -204,27 +204,38 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_mem_c, &c, sizeof(float) * input_size * input_size, cudaMemcpyHostToDevice);
     cudaMemcpy(dev_mem_input, &maxpool_input, sizeof(float) * input_size * input_size, cudaMemcpyHostToDevice);
 
+    cudaEvent_t gemm_start, gemm_stop, maxpool_start, maxpool_stop;
+    cudaEventCreate(&gemm_start);
+    cudaEventCreate(&gemm_stop);
+    cudaEventCreate(&maxpool_start);
+    cudaEventCreate(&maxpool_stop);
     // launch CUDA kernels
-    clock_t gemm_t = clock();
     // First launch gemm kernel
+    cudaEventRecord(gemm_start);
     gemm<<<num_of_blocks, block_size>>>(dev_mem_a, dev_mem_b, dev_mem_c, alpha, beta, gemm_output, input_size);
+    cudaEventRecord(gemm_stop);
     cudaDeviceSynchronize();
     cudaError_t error = cudaGetLastError();
     if(error!=cudaSuccess) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
     }
-    gemm_t = clock() - gemm_t;
-    clock_t maxpool_t = clock();
+    cudaEventSynchronize(gemm_stop);
+    float gemm_t = 0;
+    cudaEventElapsedTime(&gemm_t,gemm_start,gemm_stop);
     // Then run maxpooling
+    cudaEventRecord(maxpool_start);
     maxpool<<<num_of_maxpool_blocks, block_size>>>(dev_mem_input, maxpool_output, input_size, filter_size);
+    cudaEventRecord(maxpool_stop);
     cudaDeviceSynchronize();
     error = cudaGetLastError();
     if(error!=cudaSuccess) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
     }
-    maxpool_t = clock() - maxpool_t; 
+    cudaEventSynchronize(stop);
+    float maxpool_t = 0;
+    cudaEventElapsedTime(&maxpool_t, maxpool_start, maxpool_stop);
     // allocate output buf in main memory
     float *gemm_output_buf = (float*) malloc (sizeof(float)*input_size*input_size);
     float *maxpool_output_buf = (float*) malloc (sizeof(float)*maxpool_output_size*maxpool_output_size);
