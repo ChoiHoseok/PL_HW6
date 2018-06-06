@@ -205,7 +205,7 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_mem_input, &maxpool_input, sizeof(float) * input_size * input_size, cudaMemcpyHostToDevice);
 
     // launch CUDA kernels
-
+    clock_t gemm_t = clock();
     // First launch gemm kernel
     gemm<<<num_of_blocks, block_size>>>(dev_mem_a, dev_mem_b, dev_mem_c, alpha, beta, gemm_output, input_size);
     cudaDeviceSynchronize();
@@ -214,7 +214,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
     }
- 
+    gemm_t = clock() - gemm_t;
+    clock_t maxpool_t = clock();
     // Then run maxpooling
     maxpool<<<num_of_maxpool_blocks, block_size>>>(dev_mem_input, maxpool_output, input_size, filter_size);
     cudaDeviceSynchronize();
@@ -223,7 +224,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
     }
- 
+    maxpool_t = clock() - maxpool_t; 
     // allocate output buf in main memory
     float *gemm_output_buf = (float*) malloc (sizeof(float)*input_size*input_size);
     float *maxpool_output_buf = (float*) malloc (sizeof(float)*maxpool_output_size*maxpool_output_size);
@@ -239,13 +240,14 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<gemm_output_buf[i]<<" ";
     }
-    
+    cout<<"gemm time: " << gemm_t;
     cout<<"\n========== MAXPOOL OUTPUT ==========\n";
     for (int i = 0; i < maxpool_output_size * maxpool_output_size; ++i) {
         if(i%maxpool_output_size==0) cout<<"\n";
         cout<<maxpool_output_buf[i]<<" ";
     }
     cout<<'\n';
+    cout <<"maxpool time: " <<maxpool_t;
     
     cudaFree(dev_mem_a);
     cudaFree(dev_mem_b);
