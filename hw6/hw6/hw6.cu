@@ -133,12 +133,13 @@ int main(int argc, char **argv) {
     
     // prints inputs for debugging.
     cout<<"filter size : "<<filter_size;
+    /*
     cout<<"\n========== MAXPOOL_INPUT ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
-    /*
+    */
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -150,14 +151,14 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<b[i]<<" ";
     }
-    */
+    /*
     cout<<"\nbeta : "<<beta<<'\n';
     cout<<"========== C ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
         cout<<c[i]<<" ";
     }
-    
+    */
     cout<<'\n';
        
     // set thread, block dimensions
