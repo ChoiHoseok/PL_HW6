@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
     }
-    cudaEventSynchronize(stop);
+    cudaEventSynchronize(maxpool_stop);
     float maxpool_t = 0;
     cudaEventElapsedTime(&maxpool_t, maxpool_start, maxpool_stop);
     // allocate output buf in main memory
