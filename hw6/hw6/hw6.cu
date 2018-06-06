@@ -92,8 +92,14 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         }
         __syncthreads();
         if(p == input_size/TILE_WIDTH - 1){
-            s_a[ty][tx] = alpha*a[row*input_size+(p+1)*TILE_WIDTH + tx];
-            s_b[ty][tx] = b[(p+1)*input_size*TILE_WIDTH+col+ty*input_size];
+            if(tx == 0 && ty ==0){
+                for(int i = 0; i < TILE_WIDTH; i++){
+                    for(int j = 0; j < TILE_WIDTH; j++){
+                        s_a[i][j] = alpha*a[(by*blockDim.y+i)*input_size+p*TILE_WIDTH + j];
+                        s_b[i][j] = b[p*input_size*TILE_WIDTH+(bx*blockDim.x+j)+i*input_size];
+                    }
+                }
+            }
             __syncthreads();
             for(int i = 0; i < input_size%TILE_WIDTH; i++){
                 result += (s_a[ty][i]*s_b[i][tx]);
@@ -101,7 +107,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         }
     }
 
-    //output[row*input_size + col] = result + c[row*input_size + col];
+    //output[row*input_size + col] = result + beta * c[row*input_size + col];
     output[row*input_size + col] = result;
     //output[row*input_size + col] = 1; 
     // write out the result to output[row*input_size + col] 
