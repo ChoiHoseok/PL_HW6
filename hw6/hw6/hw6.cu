@@ -82,7 +82,16 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
             result += (s_a[ty][i]*s_b[i][tx]);
         }
         __syncthreads();
+        if(p == input_size/TILE_WIDTH - 1){
+            s_a[ty][tx] = alpha*a[row*input_size+(p+1)*TILE_WIDTH + tx]
+            s_b[ty][tx] = b[(p+1)*input_size*TILE_WIDTH+col+ty*input_size];
+            __syncthreads();
+            for(int i = 0; i < input_size%TILE_WIDTH; i++){
+                result += (s_a[ty][i]*s_b[i][tx]);
+            }
+        }
     }
+
     output[row*input_size + col] = result + c[row*input_size + col];
     //output[row*input_size + col] = 1; 
     // write out the result to output[row*input_size + col] 
