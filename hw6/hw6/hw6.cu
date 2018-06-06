@@ -95,8 +95,8 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
             if(tx == 0 && ty ==0){
                 for(int i = 0; i < TILE_WIDTH; i++){
                     for(int j = 0; j < TILE_WIDTH; j++){
-                        s_a[i][j] = alpha*a[(by*blockDim.y+i)*input_size+p*TILE_WIDTH + j];
-                        s_b[i][j] = b[p*input_size*TILE_WIDTH+(bx*blockDim.x+j)+i*input_size];
+                        s_a[i][j] = alpha*a[(by*blockDim.y+i)*input_size+(p+1)*TILE_WIDTH + j];
+                        s_b[i][j] = b[(p+1)*input_size*TILE_WIDTH+(bx*blockDim.x+j)+i*input_size];
                     }
                 }
             }
