@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
-    
+    /*
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -150,6 +150,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<b[i]<<" ";
     }
+    */
     cout<<"\nbeta : "<<beta<<'\n';
     cout<<"========== C ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -215,14 +216,14 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<gemm_output_buf[i]<<" ";
     }
-    
+    /*
     cout<<"\n========== MAXPOOL OUTPUT ==========\n";
     for (int i = 0; i < maxpool_output_size * maxpool_output_size; ++i) {
         if(i%maxpool_output_size==0) cout<<"\n";
         cout<<maxpool_output_buf[i]<<" ";
     }
     cout<<'\n';
-
+    */
     cudaFree(dev_mem_a);
     cudaFree(dev_mem_b);
     cudaFree(dev_mem_c);
