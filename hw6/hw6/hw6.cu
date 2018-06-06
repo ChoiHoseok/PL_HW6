@@ -9,7 +9,7 @@
 #include<vector>
 #include<string>
 
-#define TILE_WIDTH 2   /* set TILE_WIDTH 16 for the evaluation! */
+#define TILE_WIDTH 4   /* set TILE_WIDTH 16 for the evaluation! */
 #define MAXPOOL_INPUT_FILENAME "input.txt"
 #define A_FILENAME "a.txt"
 #define B_FILENAME "b.txt"
@@ -92,7 +92,8 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         }
     }
 
-    output[row*input_size + col] = result + c[row*input_size + col];
+    //output[row*input_size + col] = result + c[row*input_size + col];
+    output[row*input_size + col] = result;
     //output[row*input_size + col] = 1; 
     // write out the result to output[row*input_size + col] 
     // CHANGE
