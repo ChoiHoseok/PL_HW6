@@ -27,24 +27,25 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     int col = blockDim.x * blockIdx.x + threadIdx.x;
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
-    int i,j;
     int large = 0;
 
     __shared__ float s_in[filter_size][filter_size];
 
     s_in[threadIdx.y][threadIdx.x] = input[input_size*row + col];
-    __syncthreads()
+    __syncthreads();
 
     if(threadIdx.x == 0){
         large = s_in[threadIdx.y][0];
-        for(i = 1; i < filter_size; i++){
+        for(int i = 1; i < filter_size; i++){
             if (large < s_in[threadIdx.y][i]){
                 large = s_in[threadIdx.y][i];
             }
         }
         s_in[threadIdx.y][0] = large;
+    }else{
+        return;
     }
-    __syncthreads()
+    __syncthreads();
     if(threadIdx.x == 0 && threadIdx.y == 0){
         for(i = 1; i < filter_size; i++){
             if(large < s_in[i][0]){
@@ -52,6 +53,8 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
             }
         }
         output[blockIdx.x][blockIdx.y] = large;
+    }else{
+        return;
     }
 }
 // a, b, c : input matrix address
