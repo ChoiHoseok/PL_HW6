@@ -23,7 +23,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     // input_size : width, height of input matrix
     // filter_size : filter_size of maxpolling
     // all input, output matrices are vectorized
-/*
+
     int col = blockDim.x * blockIdx.x + threadIdx.x;
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
@@ -53,7 +53,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     }else{
         return;
     }
-    */
+    
 }
 // a, b, c : input matrix address
     // alpha, beta : input constant
