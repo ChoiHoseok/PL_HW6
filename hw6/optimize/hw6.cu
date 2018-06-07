@@ -28,25 +28,24 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
     int large = 0;
-    __shared__ float s_in[TILE_WIDTH][TILE_WIDTH];
-
-    s_in[threadIdx.y][threadIdx.x] = input[input_size*row + col];
-    __syncthreads();
+    __shared__ s_large[TILE_WIDTH];
 
     if(threadIdx.x == 0){
-        large = s_in[threadIdx.y][0];
+        large = input[input_size*row]
         for(int i = 1; i < TILE_WIDTH; i++){
-            if (large < s_in[threadIdx.y][i]){
-                large = s_in[threadIdx.y][i];
+            if (large < input[input_size*row+i]){
+                large = input[input_size*row+i];
             }
         }
-        s_in[threadIdx.y][0] = large;
+        s_large[threadIdx.y] = large;
+    }else{
+        return;
     }
     __syncthreads();
     if(threadIdx.x == 0 && threadIdx.y == 0){
         for(int i = 1; i < TILE_WIDTH; i++){
-            if(large < s_in[i][0]){
-                large = s_in[i][0];
+            if(large < s_large[i]){
+                large = s_large[i];
             }
         }
         output[blockIdx.y*TILE_WIDTH + blockIdx.x] = large;
