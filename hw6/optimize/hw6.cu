@@ -226,7 +226,8 @@ int main(int argc, char **argv) {
     maxpool<<<num_of_maxpool_blocks, block_size>>>(dev_mem_input, maxpool_output, input_size, filter_size);
     cudaEventRecord(maxpool_stop);
     cudaDeviceSynchronize();
-    error = cudaGetLastError();
+    cudaError_t error = cudaGetLastError();
+    //error = cudaGetLastError();
     if(error!=cudaSuccess) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
