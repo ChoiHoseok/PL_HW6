@@ -9,7 +9,7 @@
 #include<vector>
 #include<string>
 
-#define TILE_WIDTH 16   /* set TILE_WIDTH 16 for the evaluation! */
+#define TILE_WIDTH 4   /* set TILE_WIDTH 16 for the evaluation! */
 #define MAXPOOL_INPUT_FILENAME "input.txt"
 #define A_FILENAME "a.txt"
 #define B_FILENAME "b.txt"
@@ -28,15 +28,14 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
     int large = 0;
-    const int s_size = filter_size;
-    __shared__ float s_in[s_size][s_size];
+    __shared__ float s_in[TILE_WIDTH][TILE_WIDTH];
 
     s_in[threadIdx.y][threadIdx.x] = input[input_size*row + col];
     __syncthreads();
 
     if(threadIdx.x == 0){
         large = s_in[threadIdx.y][0];
-        for(int i = 1; i < filter_size; i++){
+        for(int i = 1; i < TILE_WIDTH; i++){
             if (large < s_in[threadIdx.y][i]){
                 large = s_in[threadIdx.y][i];
             }
@@ -47,12 +46,12 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     }
     __syncthreads();
     if(threadIdx.x == 0 && threadIdx.y == 0){
-        for(int i = 1; i < filter_size; i++){
+        for(int i = 1; i < TILE_WIDTH; i++){
             if(large < s_in[i][0]){
                 large = s_in[i][0];
             }
         }
-        output[blockIdx.y*filter_size + blockIdx.x] = large;
+        output[blockIdx.y*TILE_WIDTH + blockIdx.x] = large;
     }else{
         return;
     }
