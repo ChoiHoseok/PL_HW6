@@ -9,7 +9,7 @@
 #include<vector>
 #include<string>
 
-#define TILE_WIDTH 4   /* set TILE_WIDTH 16 for the evaluation! */
+#define TILE_WIDTH 16  /* set TILE_WIDTH 16 for the evaluation! */
 #define MAXPOOL_INPUT_FILENAME "input.txt"
 #define A_FILENAME "a.txt"
 #define B_FILENAME "b.txt"
@@ -66,7 +66,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
     
-    if(row>=input_size ||col>=input_size) { return; }
+    //if(row>=input_size ||col>=input_size) { return; }
     
     // allocate 2D tiles in __shared__ memory
     __shared__ float s_a[TILE_WIDTH][TILE_WIDTH];
@@ -74,13 +74,23 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
     float result = 0;
 
-    for(int p = 0; p < input_size/TILE_WIDTH; ++p){
-        if(tx == 0 && ty ==0){
-            for(int i = 0; i < TILE_WIDTH; i++){
-                for(int j = 0; j < TILE_WIDTH; j++){
-                    s_a[i][j] = alpha*a[(by*blockDim.y+i)*input_size+p*TILE_WIDTH + j];
-                    s_b[i][j] = b[p*input_size*TILE_WIDTH+(bx*blockDim.x+j)+i*input_size];
-                }
+    for(int p = 0; p <= input_size/TILE_WIDTH; ++p){
+        if(row < input_size){
+            s_a[ty][tx] = a[row*input_size + TILE_WIDTH*P + tx];
+        }else{
+            s_a[ty][tx] = 0;
+        }
+        if(col < input_size){
+            s_b[ty][tx] = b[input_size*p*TILE_WIDTH + col + ty*input_size];
+        }else{
+            s_b[ty][tx] = 0;
+        }
+        if(p == input_size/TILE_WIDTH){
+            if(row >= input_size){
+                s_b[ty][tx] = 0;
+            }
+            if(col >= input_size){
+                s_a[ty][tx] = 0;
             }
         }
         __syncthreads();
@@ -88,22 +98,10 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
             result += (s_a[ty][i]*s_b[i][tx]);
         }
         __syncthreads();
-        if(p == input_size/TILE_WIDTH - 1){
-            if(tx == 0 && ty ==0){
-                for(int i = 0; i < TILE_WIDTH; i++){
-                    for(int j = 0; j < TILE_WIDTH; j++){
-                        s_a[i][j] = alpha*a[(by*blockDim.y+i)*input_size+(p+1)*TILE_WIDTH + j];
-                        s_b[i][j] = b[(p+1)*input_size*TILE_WIDTH+(bx*blockDim.x+j)+i*input_size];
-                    }
-                }
-            }
-            __syncthreads();
-            for(int i = 0; i < input_size%TILE_WIDTH; i++){
-                result += (s_a[ty][i]*s_b[i][tx]);
-            }
-        }
     }
-    output[row*input_size + col] = result + beta * c[row*input_size + col];
+    if(col < input_size && row < input_size){
+        output[row*input_size + col] = result + beta * c[row*input_size + col];
+    }
 }
 
 
@@ -155,7 +153,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
-    /*
+    
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -174,7 +172,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<c[i]<<" ";
     }
-    */
+    
     cout<<'\n';
        
     // set thread, block dimensions
@@ -199,13 +197,13 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_mem_input, &maxpool_input, sizeof(float) * input_size * input_size, cudaMemcpyHostToDevice);
 
     cudaEvent_t gemm_start, gemm_stop, maxpool_start, maxpool_stop;
-    //cudaEventCreate(&gemm_start);
-    //cudaEventCreate(&gemm_stop);
+    cudaEventCreate(&gemm_start);
+    cudaEventCreate(&gemm_stop);
     cudaEventCreate(&maxpool_start);
     cudaEventCreate(&maxpool_stop);
     // launch CUDA kernels
     // First launch gemm kernel
-    /*
+    
     cudaEventRecord(gemm_start);
     gemm<<<num_of_blocks, block_size>>>(dev_mem_a, dev_mem_b, dev_mem_c, alpha, beta, gemm_output, input_size);
     cudaEventRecord(gemm_stop);
@@ -218,14 +216,14 @@ int main(int argc, char **argv) {
     cudaEventSynchronize(gemm_stop);
     float gemm_t = 0;
     cudaEventElapsedTime(&gemm_t,gemm_start,gemm_stop);
-    */
+    
     // Then run maxpooling
     cudaEventRecord(maxpool_start);
     maxpool<<<num_of_maxpool_blocks, block_size>>>(dev_mem_input, maxpool_output, input_size, filter_size);
     cudaEventRecord(maxpool_stop);
     cudaDeviceSynchronize();
-    cudaError_t error = cudaGetLastError();
-    //error = cudaGetLastError();
+    //cudaError_t error = cudaGetLastError();
+    error = cudaGetLastError();
     if(error!=cudaSuccess) {
         fprintf(stderr, "ERROR %s\n", cudaGetErrorString(error));
         return 1;
@@ -243,7 +241,7 @@ int main(int argc, char **argv) {
     
     
     // prints the results
-    /*
+    
     cout<<"\n========== GEMM OUTPUT ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
@@ -251,7 +249,7 @@ int main(int argc, char **argv) {
     }
     cout<<'\n';
     cout<<"gemm time: " << gemm_t;
-    */
+    
     cout<<"\n========== MAXPOOL OUTPUT ==========\n";
     for (int i = 0; i < maxpool_output_size * maxpool_output_size; ++i) {
         if(i%maxpool_output_size==0) cout<<"\n";
