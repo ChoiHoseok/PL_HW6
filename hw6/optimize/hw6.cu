@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
     // set thread, block dimensions
     const dim3 block_size(TILE_WIDTH, TILE_WIDTH);
     cout<<block_size.x;
-    const dim3 num_of_maxpool_blocks(filter_size, filter_size);
+    const dim3 num_of_maxpool_blocks(input_size / block_size.x, input_size/ block_size.y);
     const dim3 num_of_blocks(input_size/block_size.x+1, input_size/block_size.y+1);
 
     // memory allocation for the device
