@@ -41,8 +41,6 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
             }
         }
         s_in[threadIdx.y][0] = large;
-    }else{
-        return;
     }
     __syncthreads();
     if(threadIdx.x == 0 && threadIdx.y == 0){
