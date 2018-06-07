@@ -23,7 +23,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     // input_size : width, height of input matrix
     // filter_size : filter_size of maxpolling
     // all input, output matrices are vectorized
-
+/*
     int col = blockDim.x * blockIdx.x + threadIdx.x;
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
@@ -31,7 +31,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     __shared__ float s_in[TILE_WIDTH][TILE_WIDTH];
 
     s_in[threadIdx.y][threadIdx.x] = input[input_size*row + col];
-    //__syncthreads();
+    __syncthreads();
 
     if(threadIdx.x == 0){
         large = s_in[threadIdx.y][0];
@@ -42,7 +42,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
         }
         s_in[threadIdx.y][0] = large;
     }
-    //__syncthreads();
+    __syncthreads();
     if(threadIdx.x == 0 && threadIdx.y == 0){
         for(int i = 1; i < TILE_WIDTH; i++){
             if(large < s_in[i][0]){
@@ -53,6 +53,7 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     }else{
         return;
     }
+    */
 }
 // a, b, c : input matrix address
     // alpha, beta : input constant
