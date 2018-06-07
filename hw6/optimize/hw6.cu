@@ -29,18 +29,30 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
 
     int i,j;
     int large = 0;
-    int temp;
 
-    for(i = 0; i < filter_size; i++){
-        for(j = 0; j < filter_size; j++){
-            temp = input[(input_size*filter_size*col)+(filter_size*row)+(input_size*i)+j];
-            if(large < temp){
-                large = temp; 
+    __shared__ float s_in[filter_size][filter_size];
+
+    s_in[threadIdx.y][threadIdx.x] = input[input_size*row + col];
+    __syncthreads()
+
+    if(threadIdx.x == 0){
+        large = s_in[threadIdx.y][0];
+        for(i = 1; i < filter_size; i++){
+            if (large < s_in[threadIdx.y][i]){
+                large = s_in[threadIdx.y][i];
             }
         }
+        s_in[threadIdx.y][0] = large;
     }
-    if(col < (input_size/filter_size) && row < (input_size/filter_size))
-        output[((input_size/filter_size)*col)+row] = large;
+    __syncthreads()
+    if(threadIdx.x == 0 && threadIdx.y == 0){
+        for(i = 1; i < filter_size; i++){
+            if(large < s_in[i][0]){
+                large = s_in[i][0];
+            }
+        }
+        output[blockIdx.x][blockIdx.y] = large;
+    }
 }
 // a, b, c : input matrix address
     // alpha, beta : input constant
@@ -168,7 +180,7 @@ int main(int argc, char **argv) {
     // set thread, block dimensions
     const dim3 block_size(TILE_WIDTH, TILE_WIDTH);
     cout<<block_size.x;
-    const dim3 num_of_maxpool_blocks(maxpool_output_size/block_size.x+1, maxpool_output_size/block_size.y+1);
+    const dim3 num_of_maxpool_blocks(filter_size, filter_size);
     const dim3 num_of_blocks(input_size/block_size.x+1, input_size/block_size.y+1);
 
     // memory allocation for the device
