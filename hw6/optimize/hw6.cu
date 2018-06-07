@@ -28,10 +28,10 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     int row = blockDim.y * blockIdx.y + threadIdx.y;
 
     int large = 0;
-    __shared__ s_large[TILE_WIDTH];
+    __shared__ float s_large[TILE_WIDTH];
 
     if(threadIdx.x == 0){
-        large = input[input_size*row]
+        large = input[input_size*row];
         for(int i = 1; i < TILE_WIDTH; i++){
             if (large < input[input_size*row+i]){
                 large = input[input_size*row+i];
