@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<maxpool_input[i]<<" ";
     }
-    
+    /*
     cout<<"\nalpha : "<<alpha<<'\n';
     cout<<"========== A ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
         if(i%input_size==0) cout<<"\n";
         cout<<c[i]<<" ";
     }
-    
+    */
     cout<<'\n';
        
     // set thread, block dimensions
@@ -201,12 +201,13 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_mem_input, &maxpool_input, sizeof(float) * input_size * input_size, cudaMemcpyHostToDevice);
 
     cudaEvent_t gemm_start, gemm_stop, maxpool_start, maxpool_stop;
-    cudaEventCreate(&gemm_start);
-    cudaEventCreate(&gemm_stop);
+    //cudaEventCreate(&gemm_start);
+    //cudaEventCreate(&gemm_stop);
     cudaEventCreate(&maxpool_start);
     cudaEventCreate(&maxpool_stop);
     // launch CUDA kernels
     // First launch gemm kernel
+    /*
     cudaEventRecord(gemm_start);
     gemm<<<num_of_blocks, block_size>>>(dev_mem_a, dev_mem_b, dev_mem_c, alpha, beta, gemm_output, input_size);
     cudaEventRecord(gemm_stop);
@@ -219,6 +220,7 @@ int main(int argc, char **argv) {
     cudaEventSynchronize(gemm_stop);
     float gemm_t = 0;
     cudaEventElapsedTime(&gemm_t,gemm_start,gemm_stop);
+    */
     // Then run maxpooling
     cudaEventRecord(maxpool_start);
     maxpool<<<num_of_maxpool_blocks, block_size>>>(dev_mem_input, maxpool_output, input_size, filter_size);
@@ -242,6 +244,7 @@ int main(int argc, char **argv) {
     
     
     // prints the results
+    /*
     cout<<"\n========== GEMM OUTPUT ==========\n";
     for (int i = 0; i < input_size * input_size; ++i) {
         if(i%input_size==0) cout<<"\n";
@@ -249,6 +252,7 @@ int main(int argc, char **argv) {
     }
     cout<<'\n';
     cout<<"gemm time: " << gemm_t;
+    */
     cout<<"\n========== MAXPOOL OUTPUT ==========\n";
     for (int i = 0; i < maxpool_output_size * maxpool_output_size; ++i) {
         if(i%maxpool_output_size==0) cout<<"\n";
