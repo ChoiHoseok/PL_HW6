@@ -76,7 +76,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
     for(int p = 0; p <= input_size/TILE_WIDTH; ++p){
         if(row < input_size){
-            s_a[ty][tx] = a[row*input_size + TILE_WIDTH*P + tx];
+            s_a[ty][tx] = a[row*input_size + TILE_WIDTH*p + tx];
         }else{
             s_a[ty][tx] = 0;
         }
