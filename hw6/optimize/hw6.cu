@@ -66,7 +66,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
 
-    int phases = input_size / TILE_WIDTH + 1
+    int phases = input_size / TILE_WIDTH + 1;
     
     //if(row>=input_size ||col>=input_size) { return; }
     
