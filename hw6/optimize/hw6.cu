@@ -77,23 +77,13 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     float result = 0;
 
     for(int p = 0; p < phases; ++p){
-        if(row < input_size){
-            s_a[ty][tx] = a[row*input_size + TILE_WIDTH*p + tx];
-        }else{
-            s_a[ty][tx] = 0;
-        }
-        if(col < input_size){
-            s_b[ty][tx] = b[input_size*p*TILE_WIDTH + col + ty*input_size];
-        }else{
+        s_a[ty][tx] = a[input_size*row + tx + p*TILE_WIDTH];
+        s_b[ty][tx] = b[input_size*ty + input_size*p*TILE_WIDTH + col];
+        if(col >= input_size || p*TILE_WIDTH + ty >= input_size){
             s_b[ty][tx] = 0;
         }
-        if(p == phases - 1){
-            if(row >= input_size){
-                s_b[ty][tx] = 0;
-            }
-            if(col >= input_size){
-                s_a[ty][tx] = 0;
-            }
+        if(row >= input_size || p*TILE_WIDTH + tx >= input_size){
+            s_a[ty][tx] = 0;
         }
         __syncthreads();
         for(int i = 0; i < TILE_WIDTH;i++){
