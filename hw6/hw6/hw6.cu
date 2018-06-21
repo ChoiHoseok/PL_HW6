@@ -91,7 +91,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
             }
         }
     }
-    output[row*input_size + col] = result + beta * c[row*input_size + col];
+    output[row*input_size + col] = alpha * result + beta * c[row*input_size + col];
 }
 
 
