@@ -66,27 +66,35 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
 
-    int phases = input_size / TILE_WIDTH + 1;
+    int tile = TILE_WIDTH;
+
+    int phases = input_size / tile + 1;
+
+    int a_default = input_size*row +tx;
+    int b_default = input_size*ty + col;
+    int b_offset = input_size*tile;
+
+
     
     //if(row>=input_size ||col>=input_size) { return; }
     
     // allocate 2D tiles in __shared__ memory
-    __shared__ float s_a[TILE_WIDTH][TILE_WIDTH];
-    __shared__ float s_b[TILE_WIDTH][TILE_WIDTH];
+    __shared__ float s_a[tile][tile];
+    __shared__ float s_b[tile][tile];
 
     float result = 0;
 
     for(int p = 0; p < phases; ++p){
-        s_a[ty][tx] = a[input_size*row + tx + p*TILE_WIDTH];
-        s_b[ty][tx] = b[input_size*ty + input_size*p*TILE_WIDTH + col];
-        if(col >= input_size || p*TILE_WIDTH + ty >= input_size){
+        s_a[ty][tx] = a[a_default + p*tile];
+        s_b[ty][tx] = b[b_default + p*b_offset];
+        if(col >= input_size || p*tile + ty >= input_size){
             s_b[ty][tx] = 0;
         }
-        if(row >= input_size || p*TILE_WIDTH + tx >= input_size){
+        if(row >= input_size || p*tile + tx >= input_size){
             s_a[ty][tx] = 0;
         }
         __syncthreads();
-        for(int i = 0; i < TILE_WIDTH;i++){
+        for(int i = 0; i < tile;i++){
             result += (s_a[ty][i]*s_b[i][tx]);
         }
         __syncthreads();
