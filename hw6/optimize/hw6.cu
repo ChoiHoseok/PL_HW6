@@ -9,7 +9,7 @@
 #include<vector>
 #include<string>
 
-#define TILE_WIDTH 4  /* set TILE_WIDTH 16 for the evaluation! */
+#define TILE_WIDTH 16  /* set TILE_WIDTH 16 for the evaluation! */
 #define MAXPOOL_INPUT_FILENAME "input.txt"
 #define A_FILENAME "a.txt"
 #define B_FILENAME "b.txt"
@@ -65,7 +65,10 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
-    
+
+    int a_default = input_size*row +tx;
+    int b_default = input_size*ty + col;
+
     //if(row>=input_size ||col>=input_size) { return; }
     
     // allocate 2D tiles in __shared__ memory
