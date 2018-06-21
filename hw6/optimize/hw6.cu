@@ -65,6 +65,8 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
+
+    int phases = input_size / TILE_WIDTH + 1
     
     //if(row>=input_size ||col>=input_size) { return; }
     
@@ -74,7 +76,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
     float result = 0;
 
-    for(int p = 0; p < blockDim.x; ++p){
+    for(int p = 0; p < phases; ++p){
         if(row < input_size){
             s_a[ty][tx] = a[row*input_size + TILE_WIDTH*p + tx];
         }else{
@@ -85,7 +87,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
         }else{
             s_b[ty][tx] = 0;
         }
-        if(p == blockDim.x - 1){
+        if(p == phases - 1){
             if(row >= input_size){
                 s_b[ty][tx] = 0;
             }
