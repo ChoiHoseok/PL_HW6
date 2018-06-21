@@ -66,8 +66,6 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
 
-    __constant__ int phases = input_size / TILE_WIDTH + 1;
-
     int a_default = input_size*row +tx;
     int b_default = input_size*ty + col;
 
@@ -81,7 +79,7 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
 
     float result = 0;
 
-    for(int p = 0; p < phases; ++p){
+    for(int p = 0; p < input_size / TILE_WIDTH + 1; ++p){
         s_a[ty][tx] = a[a_default + p*TILE_WIDTH];
         s_b[ty][tx] = b[b_default + p*input_size*TILE_WIDTH];
         if(col >= input_size || p*TILE_WIDTH + ty >= input_size){
