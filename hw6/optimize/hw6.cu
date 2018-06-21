@@ -79,8 +79,8 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     //if(row>=input_size ||col>=input_size) { return; }
     
     // allocate 2D tiles in __shared__ memory
-    __shared__ float s_a[tile][tile];
-    __shared__ float s_b[tile][tile];
+    __shared__ float s_a[TILE_WIDTH][TILE_WIDTH];
+    __shared__ float s_b[TILE_WIDTH][TILE_WIDTH];
 
     float result = 0;
 
