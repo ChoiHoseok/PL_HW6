@@ -66,6 +66,8 @@ __global__ void gemm(float *a, float *b, float *c, const float alpha, const floa
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
 
+    int input_size = input_size;
+
     int a_default = input_size*row +tx;
     int b_default = input_size*ty + col;
 
