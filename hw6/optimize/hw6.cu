@@ -59,14 +59,14 @@ __global__ void maxpool(float *input, float *output, const int input_size, const
     // output : output buffer address
     // input_size : width, height of input matrix
     // all input, output matrices are vectorized
-__global__ void gemm(float *a, float *b, float *c, const float alpha, const float beta, float *output, const int input_size){
+__global__ void gemm(float *a, float *b, float *c, const float alpha, const float beta, float *output, const int input_s){
     int tx = threadIdx.x, ty = threadIdx.y;
     int bx = blockIdx.x,  by = blockIdx.y;
 
     int row = by*blockDim.y + ty;
     int col = bx*blockDim.x + tx;
 
-    int input_size = input_size;
+    int input_size = input_s;
 
     int a_default = input_size*row +tx;
     int b_default = input_size*ty + col;
